@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-200: #bae6fd;
+  --color-primary-300: #7dd3fc;
+  --color-primary-400: #38bdf8;
+  --color-primary-500: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+  --color-primary-800: #075985;
+  --color-primary-900: #0c4a6e;
+  --color-primary-950: #082f49;
+
+  --color-secondary-50: #fdf4ff;
+  --color-secondary-100: #fae8ff;
+  --color-secondary-200: #f5d0fe;
+  --color-secondary-300: #f0abfc;
+  --color-secondary-400: #e879f9;
+  --color-secondary-500: #d946ef;
+  --color-secondary-600: #c026d3;
+  --color-secondary-700: #a21caf;
+  --color-secondary-800: #86198f;
+  --color-secondary-900: #701a75;
+  --color-secondary-950: #4a044e;
+
+  --font-sans: "Inter", "ui-sans-serif", "system-ui";
+}
+
+:root {
+  --primary-color: var(--color-primary-500);
+  --secondary-color: var(--color-secondary-500);
+  --bg-color: #f8fafc;
+  --text-color: #0f172a;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* Shared UI primitives */
+.ui-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--ui-input-bg, #ffffff);
+  border: 1px solid var(--ui-input-border, #e2e8f0);
+  border-radius: 0.5rem;
+  color: var(--ui-input-text, #0f172a);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.ui-input::placeholder {
+  color: var(--ui-input-placeholder, #94a3b8);
+}
+
+.ui-input:focus {
+  outline: none;
+  border-color: var(--ui-input-focus, var(--color-primary-500));
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
+}
+
+.ui-input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ui-input--with-icon {
+  padding-left: 2.75rem;
+}
+
+.ui-input--sm {
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+}
+
+.ui-input--lg {
+  padding: 0.875rem 1.125rem;
+  font-size: 1rem;
+}
+
+.ui-input-wrap {
+  position: relative;
+}
+
+.ui-input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ui-input-icon, #64748b);
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}

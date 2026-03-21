@@ -1,0 +1,15 @@
+<div class="layout-container">
+  @if (userRole() === 'owner') {
+    <app-owner-sidebar></app-owner-sidebar>
+  } @else {
+    <app-member-sidebar></app-member-sidebar>
+  }
+  
+  <div class="main-content">
+    <app-header></app-header>
+    
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

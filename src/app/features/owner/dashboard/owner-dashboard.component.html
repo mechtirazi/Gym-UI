@@ -1,0 +1,33 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">Welcome back, {{ ownerName }} 👋</h1>
+      <p class="mt-2 text-slate-500">Here's what's happening at your gym today.</p>
+    </div>
+    <!-- Quick action button -->
+    <button class="add-member-btn" (click)="showMemberModal.set(true)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      <span>Add Member</span>
+    </button>
+  </header>
+
+  <!-- Extracted Stats Grid -->
+  <app-dashboard-stats></app-dashboard-stats>
+
+  <!-- Main Content Areas -->
+  <div class="dashboard-content">
+    <app-revenue-chart></app-revenue-chart>
+    <app-recent-checkins></app-recent-checkins>
+  </div>
+</div>
+
+<!-- Extracted Add Member Modal -->
+@if (showMemberModal()) {
+  <app-add-member-modal 
+    (close)="showMemberModal.set(false)" 
+    (memberAdded)="showMemberModal.set(false)">
+  </app-add-member-modal>
+}

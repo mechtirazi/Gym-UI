@@ -1,0 +1,20 @@
+@if (isLoadingStats()) {
+  <div class="stats-loading">
+    <div class="loading-spinner"></div>
+    <p>Loading your dashboard stats...</p>
+  </div>
+} @else {
+  <div class="stats-grid">
+    @for (stat of stats(); track stat.label) {
+      <div class="stat-card">
+        <div class="stat-header">
+          <h3 class="stat-label">{{ stat.label }}</h3>
+          <span class="stat-trend" [class.positive]="stat.isPositive" [class.negative]="!stat.isPositive">
+            {{ stat.trend }}
+          </span>
+        </div>
+        <p class="stat-value">{{ stat.value }}</p>
+      </div>
+    }
+  </div>
+}
