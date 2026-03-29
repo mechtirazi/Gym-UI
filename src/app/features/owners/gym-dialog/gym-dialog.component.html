@@ -1,0 +1,55 @@
+<div class="p-6">
+  <div class="dialog-header">
+    <h2>Add New Gym</h2>
+    <p>Assigning a new gym to <strong>{{ data.ownerName }}</strong>.</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    
+    <div *ngIf="errorMessage()" class="p-3 mb-2 bg-red-50 text-red-700 text-sm rounded-lg border border-red-100 flex items-center gap-2">
+      <mat-icon class="text-sm">error_outline</mat-icon>
+      {{ errorMessage() }}
+    </div>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Gym Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g. Iron Forge Fitness" required>
+      <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
+      <mat-error *ngIf="form.get('name')?.hasError('minlength')">Name must be at least 2 characters</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Address (Optional)</mat-label>
+      <input matInput formControlName="adress" placeholder="Physical location">
+    </mat-form-field>
+
+    <div class="grid grid-cols-2 gap-4">
+      <mat-form-field appearance="outline">
+        <mat-label>Capacity</mat-label>
+        <input matInput type="number" formControlName="capacity" placeholder="e.g. 100">
+        <mat-error *ngIf="form.get('capacity')?.hasError('required')">Capacity is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Open Hours</mat-label>
+        <input matInput formControlName="open_hour" placeholder="e.g. 08:00-22:00">
+        <mat-error *ngIf="form.get('open_hour')?.hasError('required')">Open Hours is required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Phone Number (Optional)</mat-label>
+      <input matInput formControlName="phone" placeholder="+1 ...">
+    </mat-form-field>
+    
+    <div class="dialog-actions">
+      <button type="button" mat-stroked-button mat-dialog-close [disabled]="loading()">Cancel</button>
+      <button type="submit" mat-flat-button color="primary" [disabled]="form.invalid || loading()">
+        <span class="flex items-center gap-2">
+          <mat-icon *ngIf="loading()" class="animate-spin text-sm">refresh</mat-icon>
+          {{ loading() ? 'Creating...' : 'Create Gym' }}
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

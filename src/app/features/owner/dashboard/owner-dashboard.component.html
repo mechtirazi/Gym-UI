@@ -110,9 +110,12 @@
             <span class="legend-item"><span class="dot bg-amber-500"></span> New Sign-ups</span>
             <span class="legend-item"><span class="dot bg-rose-500"></span> Cancelations</span>
           </div>
-          <!-- Now using light-theme-chart -->
           <div class="light-theme-chart flex-1" style="margin: 0 -12px;">
-            <app-revenue-chart></app-revenue-chart>
+            @defer (on viewport) {
+              <app-revenue-chart></app-revenue-chart>
+            } @placeholder {
+              <div class="h-64 flex items-center justify-center bg-slate-50 rounded-xl border border-slate-100 animate-pulse text-slate-400">Loading chart...</div>
+            }
           </div>
         </div>
 
@@ -227,37 +230,11 @@
           </div>
         </div>
         <div class="feed-scrollable list-scrollbar">
-          <table class="checkin-table">
-            <thead>
-              <tr>
-                <th style="width: 30px;">Menu</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th style="text-align: right;">Last Visit</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (checkin of recentCheckins(); track checkin.id) {
-              <tr>
-                <td>
-                  <div
-                    class="flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 text-slate-600 font-bold"
-                    style="font-size: 9px;">
-                    {{ checkin.initials || '??' }}
-                  </div>
-                </td>
-                <td class="fw-bold">{{ checkin.memberName }}</td>
-                <td style="color: #10b981; font-weight: 800;">Online</td>
-                <td style="text-align: right;" class="text-muted">{{ checkin.timeAgo }}</td>
-              </tr>
-              } @empty {
-              <tr>
-                <td colspan="4" style="text-align: center; padding: 1.5rem 0;" class="text-muted font-medium">No recent
-                  check-ins found.</td>
-              </tr>
-              }
-            </tbody>
-          </table>
+          @defer (on viewport) {
+            <app-recent-checkins></app-recent-checkins>
+          } @placeholder {
+            <div class="h-64 flex items-center justify-center bg-slate-50 rounded-xl border border-slate-100 animate-pulse text-slate-400">Loading check-ins...</div>
+          }
         </div>
       </div>
 
@@ -302,5 +279,6 @@
       </div>
 
     </div>
+
   </div>
 </div>

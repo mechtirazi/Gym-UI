@@ -1,0 +1,65 @@
+<div class="nested-container">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+      <mat-icon class="text-slate-400" style="font-size: 18px; height: 18px; width: 18px;">storefront</mat-icon>
+      Gyms for {{ ownerName }}
+    </h3>
+    <button mat-stroked-button color="primary" class="!rounded-full" (click)="openAddGymDialog()">
+      <mat-icon>add</mat-icon> Add Gym to this Owner
+    </button>
+  </div>
+
+  <div *ngIf="loading()" class="py-6 flex justify-center items-center">
+    <mat-spinner diameter="30"></mat-spinner>
+  </div>
+
+  <div *ngIf="error()" class="p-4 bg-red-50 text-red-600 rounded-lg text-sm flex items-center gap-2">
+    <mat-icon>error_outline</mat-icon> {{ error() }}
+  </div>
+
+  <div *ngIf="!loading() && !error() && gyms().length === 0" class="py-8 text-center bg-white rounded-xl border border-slate-200 border-dashed">
+    <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+      <mat-icon class="text-slate-400">gym</mat-icon>
+    </div>
+    <p class="text-slate-500 font-medium">No gyms assigned yet</p>
+    <p class="text-xs text-slate-400 mt-1">Click "Add Gym" to assign a new facility.</p>
+  </div>
+
+  <div *ngIf="!loading() && !error() && gyms().length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div *ngFor="let gym of gyms(); trackBy: trackByGymId" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-2 relative overflow-hidden group hover:border-primary-200 transition-colors">
+      <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-primary-50 to-primary-100 rounded-bl-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      
+      <div class="flex justify-between items-start">
+        <h4 class="font-bold text-slate-800 text-base truncate pr-2">{{ gym.name }}</h4>
+        <span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider flex-shrink-0"
+              [ngClass]="gym.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
+          {{ gym.status }}
+        </span>
+      </div>
+      
+      <div class="flex items-center gap-4 mt-2">
+        <div class="flex items-center gap-1.5 text-slate-500 text-xs font-medium">
+          <mat-icon class="text-[14px] w-3.5 h-3.5">people</mat-icon>
+          {{ gym.members_count || 0 }} members
+        </div>
+        <div class="flex items-center gap-1.5 text-slate-500 text-xs font-medium" *ngIf="gym.created_at">
+          <mat-icon class="text-[14px] w-3.5 h-3.5">calendar_today</mat-icon>
+          {{ gym.created_at | date:'mediumDate' }}
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end border-t border-slate-100 pt-3 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button *ngIf="gym.status === 'active'" 
+                class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                (click)="openSuspendDialog(gym)">
+          <mat-icon class="!text-[16px] !w-4 !h-4">block</mat-icon> Suspend
+        </button>
+        <button *ngIf="gym.status === 'suspended'" 
+                class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                (click)="activateGym(gym)">
+          <mat-icon class="!text-[16px] !w-4 !h-4">check_circle</mat-icon> Activate
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

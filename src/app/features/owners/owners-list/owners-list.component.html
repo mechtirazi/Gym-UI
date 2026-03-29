@@ -1,0 +1,215 @@
+<section class="owners-page" aria-label="Owners management">
+  <header class="page-header">
+    <div class="title-block">
+      <h1 class="page-title">Owners and Gym</h1>
+      <p class="page-subtitle">
+        Manage platform owner accounts, verification status, and administrative actions.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        mat-stroked-button
+        class="icon-action"
+        (click)="loadOwners()"
+        [disabled]="loading()"
+        aria-label="Refresh owners list"
+      >
+        <mat-icon [class.spin]="loading()">refresh</mat-icon>
+        <span class="action-text">Refresh</span>
+      </button>
+
+      <button
+        *appCan="['users.ownerCrud']"
+        type="button"
+        mat-flat-button
+        class="primary-action"
+        (click)="openDialog()"
+      >
+        <mat-icon>add</mat-icon>
+        Create owner
+      </button>
+    </div>
+  </header>
+
+  <div class="toolbar" role="search">
+    <label class="search" aria-label="Search owners">
+      <mat-icon class="search-icon" aria-hidden="true">search</mat-icon>
+      <input
+        [formControl]="searchControl"
+        type="search"
+        class="search-input"
+        placeholder="Search by name or email…"
+        autocomplete="off"
+      />
+      <button
+        *ngIf="searchControl.value"
+        type="button"
+        mat-icon-button
+        class="clear-btn"
+        (click)="searchControl.setValue('')"
+        aria-label="Clear search"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </label>
+
+    <div class="meta" aria-live="polite">
+      <span class="count">
+        {{ filteredData().length }} owner{{ filteredData().length === 1 ? '' : 's' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div *ngIf="loading()" class="owners-grid" aria-label="Loading owners">
+      <article class="owner-card skeleton" *ngFor="let _ of [1,2,3,4,5,6]">
+        <div class="card-top">
+          <div class="avatar shimmer" aria-hidden="true"></div>
+          <div class="top-text">
+            <div class="line shimmer"></div>
+            <div class="line line-sm shimmer"></div>
+          </div>
+          <div class="pill shimmer" aria-hidden="true"></div>
+        </div>
+        <div class="card-body">
+          <div class="row shimmer"></div>
+          <div class="row shimmer"></div>
+        </div>
+        <div class="card-footer">
+          <div class="footer-actions">
+            <div class="icon shimmer"></div>
+            <div class="icon shimmer"></div>
+            <div class="icon shimmer"></div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div *ngIf="!loading() && filteredData().length === 0" class="empty" role="status">
+      <div class="empty-icon" aria-hidden="true">
+        <mat-icon>person_search</mat-icon>
+      </div>
+      <h2 class="empty-title">No owners found</h2>
+      <p class="empty-subtitle">
+        Try a different search, or create a new owner.
+      </p>
+      <div class="empty-actions">
+        <button type="button" mat-stroked-button (click)="searchControl.setValue('')">
+          Clear search
+        </button>
+        <button
+          *appCan="['users.ownerCrud']"
+          type="button"
+          mat-flat-button
+          class="primary-action"
+          (click)="openDialog()"
+        >
+          <mat-icon>add</mat-icon>
+          Create owner
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="!loading() && filteredData().length > 0" class="owners-table-wrap bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 overflow-hidden shadow-sm">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <th class="py-4 px-6">Owner</th>
+            <th class="py-4 px-6">Status</th>
+            <th class="py-4 px-6">Registered</th>
+            <th class="py-4 px-6">Contact</th>
+            <th class="py-4 px-6 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let owner of filteredData(); trackBy: trackByOwnerId">
+            <!-- Main Row -->
+            <tr class="border-b border-gray-200 dark:border-slate-700 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer" 
+                (click)="toggleRow(owner.id_user)"
+                [class.bg-blue-50]="expandedOwnerId() === owner.id_user"
+                [class.dark:bg-blue-900/20]="expandedOwnerId() === owner.id_user">
+              <td class="py-4 px-6">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700"
+                       [class.bg-blue-100]="expandedOwnerId() === owner.id_user"
+                       [class.text-blue-700]="expandedOwnerId() === owner.id_user"
+                       [class.dark:bg-blue-800]="expandedOwnerId() === owner.id_user"
+                       [class.dark:text-blue-200]="expandedOwnerId() === owner.id_user">
+                    {{ owner.initials }}
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <div class="font-bold text-slate-900 dark:text-slate-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">{{ owner.fullName }}</div>
+                      <span *ngIf="owner.owned_gyms_count !== undefined" 
+                            class="px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[9px] font-black border border-slate-200 dark:border-slate-700 shadow-sm"
+                            title="Owned Gyms Count">
+                        {{ owner.owned_gyms_count }}
+                      </span>
+                    </div>
+                    <div class="text-xs font-medium text-slate-500 dark:text-slate-400">{{ owner.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 px-6">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider shadow-sm border"
+                      [ngClass]="owner.verified ? 'bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-800' : 'bg-amber-50 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border-amber-200/50 dark:border-amber-800'">
+                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="owner.verified ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                  {{ owner.verificationStatus }}
+                </span>
+              </td>
+              <td class="py-4 px-6">
+                <div class="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  {{ owner.created_at ? (owner.created_at | date:'MMM d, y') : '—' }}
+                </div>
+              </td>
+              <td class="py-4 px-6">
+                <div class="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  {{ owner.phone || '—' }}
+                </div>
+              </td>
+              <td class="py-4 px-6 text-right">
+                <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity" (click)="$event.stopPropagation()">
+                  <button type="button" mat-icon-button class="text-slate-400 hover:text-blue-600 hover:bg-blue-50" (click)="impersonateOwner(owner)" matTooltip="Impersonate">
+                    <mat-icon class="text-[20px]">visibility</mat-icon>
+                  </button>
+                  <button *ngIf="(+owner.active_gyms_count! || 0) > 0" 
+                          type="button" mat-icon-button class="text-slate-400 hover:text-orange-600 hover:bg-orange-50 font-bold" (click)="disableAllGyms(owner)" matTooltip="Disable All Gyms">
+                    <mat-icon class="text-[20px]">block</mat-icon>
+                  </button>
+                  <button *ngIf="(+owner.active_gyms_count! || 0) === 0 && (+owner.owned_gyms_count! || 0) > 0" 
+                          type="button" mat-icon-button class="text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 font-bold" (click)="activateAllGyms(owner)" matTooltip="Activate All Gyms">
+                    <mat-icon class="text-[20px]">check_circle</mat-icon>
+                  </button>
+                  <button type="button" mat-icon-button class="text-slate-400 hover:text-amber-600 hover:bg-amber-50" (click)="editOwner(owner)" matTooltip="Edit">
+                    <mat-icon class="text-[20px]">edit</mat-icon>
+                  </button>
+                  <button type="button" mat-icon-button class="text-slate-400 hover:text-red-600 hover:bg-red-50" (click)="deleteOwner(owner)" matTooltip="Delete">
+                    <mat-icon class="text-[20px]">delete_outline</mat-icon>
+                  </button>
+                  
+                </div>
+                <!-- Expansion arrow if no hover action -->
+                <mat-icon class="text-slate-300 dark:text-slate-600 transition-transform duration-300 absolute right-6 group-hover:opacity-0"
+                          [class.rotate-180]="expandedOwnerId() === owner.id_user">
+                  expand_more
+                </mat-icon>
+              </td>
+            </tr>
+            
+            <!-- Expanded Details Row -->
+            <tr *ngIf="expandedOwnerId() === owner.id_user" class="bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 shadow-inner">
+              <td colspan="5" class="p-0">
+                <div class="animate-in slide-in-from-top-2 fade-in duration-300">
+                  <app-owner-gyms-list [ownerId]="owner.id_user" [ownerName]="owner.fullName"></app-owner-gyms-list>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+

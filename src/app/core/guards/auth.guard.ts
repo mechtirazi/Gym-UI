@@ -1,30 +1,49 @@
 import { inject } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/router';
+import { map, catchError, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { CapabilityService } from '../services/capability.service';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const superAdminGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const authService = inject(AuthService);
   const router = inject(Router);
-
-  if (authService.isAuthenticated()) {
-    return true;
+  
+  const user = authService.currentUser();
+  if (user) {
+    return (user.role === 'super_admin' || authService.isImpersonating()) ? true : router.parseUrl('/auth/login');
+  }
+  
+  const token = authService.getToken();
+  if (!token) {
+    return router.parseUrl('/auth/login');
   }
 
-  router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
-  return false;
+  // If token exists but user isn't in state (e.g. refresh), we call checkMe and wait
+  return authService.checkMe().pipe(
+    map(res => {
+      if (res.success && (res.data?.role === 'super_admin' || authService.isImpersonating())) {
+        return true;
+      }
+      return router.parseUrl('/auth/login');
+    }),
+    catchError(() => of(router.parseUrl('/auth/login')))
+  );
 };
 
-export const roleGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
+export const capabilityGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const capabilityService = inject(CapabilityService);
   const router = inject(Router);
-  const expectedRoles = route.data['roles'] as Array<string>;
 
-  const user = authService.currentUser();
-  
-  if (user && expectedRoles.includes(user.role)) {
+  // We read the required capability from route data
+  const requiredCapability = route.data['capability'] as string;
+  if (!requiredCapability) {
+    return true; // No guard if no capability required
+  }
+
+  if (capabilityService.can(requiredCapability)) {
     return true;
   }
 
-  router.navigate(['/dashboard']);
-  return false;
+  // Fallback to dashboard with forbidden flag or unauthorized component
+  return router.parseUrl('/dashboard?error=forbidden');
 };

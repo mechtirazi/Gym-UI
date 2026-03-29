@@ -1,4 +1,16 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:8000/api'
+  apiUrl: 'http://127.0.0.1:8000/api',
+  apiBaseUrl: 'http://127.0.0.1:8000',
+  healthUrl: 'http://127.0.0.1:8000/up',
+  socialAuthUrls: {
+    google: 'https://api.yourgym-platform.com/api/auth/google/redirect',
+    facebook: 'https://api.yourgym-platform.com/api/auth/facebook/redirect',
+    github: 'https://api.yourgym-platform.com/api/auth/github/redirect'
+  },
+  featureFlags: {
+    enableProducts: true,
+    enableNotifications: true,
+  },
+  lowStockThreshold: 10
 };

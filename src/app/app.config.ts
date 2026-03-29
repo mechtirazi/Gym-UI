@@ -1,12 +1,17 @@
-import { ApplicationConfig } from '@angular/core';
-import { provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
+import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
 import { routes } from './app.routes';
-import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideHttpClient(withInterceptors([jwtInterceptor]))
+    provideZonelessChangeDetection(),
+    provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
+    provideAnimationsAsync(),
+    provideHttpClient(withFetch(), withInterceptors([loadingInterceptor, authInterceptor, errorInterceptor]))
   ]
 };

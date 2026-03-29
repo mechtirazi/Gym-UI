@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ThemeService } from '../../../../core/services/theme.service';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { NotificationsService } from '../../../../core/services/notifications.service';
 
 @Component({
   selector: 'app-header',
@@ -13,8 +13,8 @@ import { NotificationService } from '../../../../core/services/notification.serv
 })
 export class HeaderComponent {
   private authService = inject(AuthService);
-  private themeService = inject(ThemeService);
-  private notificationService = inject(NotificationService);
+  public themeService = inject(ThemeService);
+  private notificationsService = inject(NotificationsService);
 
   currentUser = this.authService.currentUser;
   isDarkMode = this.themeService.darkMode;
@@ -23,8 +23,8 @@ export class HeaderComponent {
   currentLang = signal<'en' | 'fr'>('en');
 
   // Use the notification service's signals
-  notifications = this.notificationService.notifications;
-  hasUnread = this.notificationService.hasUnread;
+  notifications = this.notificationsService.notifications;
+  unreadCount = this.notificationsService.unreadCount;
 
   toggleNotifications(): void {
     this.showNotifications.update(v => !v);
@@ -40,11 +40,11 @@ export class HeaderComponent {
   }
 
   markAllAsRead(): void {
-    this.notificationService.markAllAsRead();
+    this.notificationsService.markAllAsRead().subscribe();
   }
 
-  markAsRead(id: string): void {
-    this.notificationService.markAsRead(id);
+  markAsRead(id: number): void {
+    this.notificationsService.markAsRead(id).subscribe();
   }
 
   toggleTheme(): void {

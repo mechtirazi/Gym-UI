@@ -1,0 +1,49 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <mat-icon>fitness_center</mat-icon>
+      </div>
+      <div class="logo-copy">
+        <span class="logo-title">Gym Admin</span>
+        <span class="logo-badge">Platform</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Super admin">
+    <ng-container *ngFor="let item of navItems">
+      <ng-container *ngIf="(!item.role || item.role === role()) && (!item.capability || canAccess(item.capability))">
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          #rla="routerLinkActive"
+          [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+          [attr.title]="item.label"
+          matRipple
+          class="nav-item"
+        >
+          <span class="nav-icon" [class.active]="rla.isActive">
+            <mat-icon>{{ item.icon }}</mat-icon>
+          </span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      </ng-container>
+    </ng-container>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a routerLink="/settings" routerLinkActive="active" #settingsRla="routerLinkActive" matRipple class="nav-item nav-item--footer">
+      <span class="nav-icon" [class.active]="settingsRla.isActive">
+        <mat-icon>settings</mat-icon>
+      </span>
+      <span class="nav-label">Settings</span>
+    </a>
+
+    <div class="support-card">
+      <p class="support-eyebrow">System status</p>
+      <p class="support-title">Admin workspace online</p>
+      <p class="support-desc">Access matrix, monitoring, and owner management are ready.</p>
+    </div>
+  </div>
+</aside>

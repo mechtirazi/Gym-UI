@@ -1,76 +1,146 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { User, AuthResponse } from '../../shared/models/user.model';
-import { Router, Params } from '@angular/router';
-
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, tap, catchError, throwError, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { TokenService } from './token.service';
+import { ApiAuthData, ApiResponse, UserVm } from '../models/api.models';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = environment.apiUrl;
+  private http = inject(HttpClient);
+  private tokenService = inject(TokenService);
+  private router = inject(Router);
 
   // State using Signals
-  currentUser = signal<User | null>(this.getUserFromStorage());
-  isAuthenticated = computed(() => !!this.currentUser());
-  userRole = computed(() => this.currentUser()?.role);
-  connectedGymId = computed(() => this.currentUser()?.gym_id);
+  public currentUser = signal<any | null>(this.getUserFromStorage());
+  public isAuthenticated = computed(() => !!this.currentUser());
+  public connectedGymId = computed(() => this.currentUser()?.gym_id);
 
-  constructor(private http: HttpClient, private router: Router) { }
+  public userRole = computed(() => this.currentUser()?.role || '');
 
-  getApiUrl(): string {
-    return this.API_URL;
+  public isImpersonating = signal<boolean>(!!localStorage.getItem('original_admin_token'));
+
+  getToken(): string | null { return this.tokenService.getToken(); }
+  getApiUrl(): string { return environment.apiUrl; }
+  register(payload: any): Observable<any> { return this.http.post(`${environment.apiUrl}/register`, payload); }
+  handleSocialLogin(params: any): boolean { return true; }
+  forgotPassword(email: string): Observable<any> { return this.http.post(`${environment.apiUrl}/forgot-password`, { email }); }
+  resetPassword(payload: any): Observable<any> { return this.http.post(`${environment.apiUrl}/reset-password`, payload); }
+
+  /** Log in user */
+  login(payload: any): Observable<ApiResponse<ApiAuthData>> {
+    return this.http.post<ApiResponse<ApiAuthData>>(`${environment.apiBaseUrl}/api/auth/login`, payload).pipe(
+      tap(res => {
+        if (res.success && res.data?.access_token) {
+          this.tokenService.setToken(res.data.access_token);
+          if (res.data.user) {
+            this.currentUser.set(res.data.user);
+          }
+        }
+      })
+    );
   }
 
-  handleSocialLogin(params: Params): boolean {
-    const token = params['token'];
-    const userParam = params['u'] || params['user'];
+  /** Refresh token */
+  refresh(): Observable<ApiResponse<ApiAuthData>> {
+    return this.http.post<ApiResponse<ApiAuthData>>(`${environment.apiBaseUrl}/api/refresh`, {}).pipe(
+      tap(res => {
+        if (res.success && res.data?.access_token) {
+          this.tokenService.setToken(res.data.access_token);
+        }
+      })
+    );
+  }
 
-    if (!token || !userParam) return false;
+  /** Impersonate a user */
+  impersonate(id_user: number, userName?: string): Observable<any> {
+    return this.http.post<ApiResponse<any>>(`${environment.apiBaseUrl}/api/admin/impersonate/${id_user}`, {}).pipe(
+      tap(res => {
+        if (res.success && res.data?.access_token) {
+          const currentToken = this.tokenService.getToken();
+          if (currentToken) {
+            localStorage.setItem('original_admin_token', currentToken);
+          }
+          if (userName) {
+            localStorage.setItem('impersonated_user_name', userName);
+          } else if (res.data.user) {
+            localStorage.setItem('impersonated_user_name', `${res.data.user.name} ${res.data.user.last_name || ''}`.trim());
+          }
+          this.tokenService.setToken(res.data.access_token);
+          this.isImpersonating.set(true);
+          
+          // Re-initialize the user state before deciding where to route
+          this.checkMe().subscribe(() => {
+            const role = this.currentUser()?.role;
+            if (role === 'owner') {
+              window.open('/owner/dashboard', '_blank');
+            } else if (role === 'member') {
+              window.open('/member/dashboard', '_blank');
+            } else {
+              window.open('/', '_blank');
+            }
+          });
+        }
+      })
+    );
+  }
 
-    try {
-      const isBase64 = !!params['u'];
-      const userStr = isBase64 ? atob(userParam) : userParam;
-      const user = JSON.parse(userStr);
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', userStr);
-      this.currentUser.set(user);
-      return true;
-    } catch (e) {
-      console.error('Social login parsing error:', e);
-      return false;
+  /** Stop impersonating */
+  stopImpersonating(): void {
+    const originalToken = localStorage.getItem('original_admin_token');
+    if (originalToken) {
+      this.tokenService.setToken(originalToken);
+    } else {
+      this.tokenService.clearToken();
+    }
+    localStorage.removeItem('original_admin_token');
+    localStorage.removeItem('impersonated_user_name');
+    this.isImpersonating.set(false);
+    window.location.reload();
+  }
+
+  /** Check me */
+  checkMe(): Observable<ApiResponse<UserVm>> {
+    const url = `${environment.apiBaseUrl}/api/me`;
+    return this.http.get<ApiResponse<UserVm>>(url).pipe(
+      tap(res => {
+        if (res.success && res.data) {
+          this.currentUser.set(res.data);
+        }
+      })
+    );
+  }
+
+  /** Resend verification */
+  resendVerification(email: string): Observable<ApiResponse<null>> {
+    return this.http.post<ApiResponse<null>>(`${environment.apiBaseUrl}/api/auth/resend-verification`, { email });
+  }
+
+  /** Logout */
+  logout(navigate: boolean = true): void {
+    const token = this.tokenService.getToken();
+    if (token) {
+      this.http.post(`${environment.apiBaseUrl}/api/logout`, {}).pipe(
+        catchError(() => of(null)) // Ignore errors on logout
+      ).subscribe();
+    }
+    this.tokenService.clearToken();
+    this.currentUser.set(null);
+    if (navigate) {
+      this.router.navigate(['/auth/login']);
     }
   }
 
-  login(credentials: any): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.API_URL}/auth/login`, credentials).pipe(
-      tap(response => this.handleAuthentication(response))
-    );
-  }
-
-  register(userData: any): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.API_URL}/auth/register`, userData).pipe(
-      tap(response => this.handleAuthentication(response))
-    );
-  }
-
-  logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.currentUser.set(null);
-    this.router.navigate(['/auth/login']);
-  }
-
-  updateCurrentUser(user: User): void {
+  updateCurrentUser(user: any): void {
     localStorage.setItem('user', JSON.stringify(user));
     this.currentUser.set(user);
   }
 
   switchGym(gymId: number): void {
-    const user = this.currentUser();
+    const user: any = this.currentUser();
     if (user) {
       const updatedUser = { ...user, gym_id: gymId };
       this.updateCurrentUser(updatedUser);
@@ -81,20 +151,7 @@ export class AuthService {
     }
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
-  private handleAuthentication(response: AuthResponse): void {
-    if (response.success && response.data) {
-      const { access_token, user } = response.data;
-      localStorage.setItem('token', access_token);
-      localStorage.setItem('user', JSON.stringify(user));
-      this.currentUser.set(user);
-    }
-  }
-
-  private getUserFromStorage(): User | null {
+  private getUserFromStorage(): any {
     try {
       const userStr = localStorage.getItem('user');
       if (!userStr || userStr === 'undefined') {
@@ -111,7 +168,7 @@ export class AuthService {
   getAvatarUrl(path?: string): string {
     if (!path) return '';
     if (path.startsWith('http')) return path;
-    const baseUrl = this.API_URL.replace('/api', '');
+    const baseUrl = environment.apiUrl.replace('/api', '');
     return `${baseUrl}/storage/${path}`;
   }
 }

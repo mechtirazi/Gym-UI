@@ -1,45 +1,32 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
-import { socialCallbackGuard } from './core/guards/social-callback.guard';
-import { roleRedirectGuard } from './core/guards/role-redirect.guard';
+import { superAdminGuard, capabilityGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
     path: 'auth',
-    children: [
-      {
-        path: 'login',
-        loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
-      },
-      {
-        path: 'register',
-        loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent)
-      },
-      {
-        path: 'callback',
-        canActivate: [socialCallbackGuard],
-        loadComponent: () => import('./features/auth/social-callback/social-callback').then(m => m.SocialCallback)
-      },
-      { path: '', redirectTo: 'login', pathMatch: 'full' }
-    ]
+    loadChildren: () => import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
-  // The Smart Redirecting Root Route for dashboards
   {
-    path: 'dashboard',
-    canActivate: [roleRedirectGuard],
-    // The component won't actually render if the guard redirects immediately,
-    // but Angular requires a valid layout mapping.
-    loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+    path: 'suspended',
+    loadComponent: () => import('./features/auth/pages/suspended-account.component').then((c) => c.SuspendedAccountComponent),
   },
-  // The Main Authenticated App wrapper for segregated feature domains
+  {
+    path: 'subscription-expired',
+    loadComponent: () => import('./features/auth/pages/subscription-expired.component').then((c) => c.SubscriptionExpiredComponent),
+  },
   {
     path: '',
-    loadComponent: () => import('./shared/layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
-    // canActivate: [authGuard],
+    loadComponent: () => import('./core/layout/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
+    canActivate: [superAdminGuard], // Only super_admin can access the main app shell
     children: [
       { 
         path: 'settings', 
         loadComponent: () => import('./features/shared/settings/settings.component').then(m => m.SettingsComponent) 
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard.component').then((c) => c.DashboardComponent),
       },
       {
         path: 'owner',
@@ -63,14 +50,63 @@ export const routes: Routes = [
         ]
       },
       {
-        path: 'member',
-        children: [
-          { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
-          { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
-        ]
-      }
-    ]
+        path: 'owners',
+        canActivate: [capabilityGuard],
+        data: { capability: 'users.ownerCrud' },
+        loadChildren: () => import('./features/owners/owners.routes').then((m) => m.OWNER_ROUTES),
+      },
+
+
+      {
+        path: 'notifications',
+        canActivate: [capabilityGuard],
+        data: { capability: 'notifications.self' },
+        loadComponent: () =>
+          import('./features/notifications/notifications.component').then(
+            (c) => c.NotificationsComponent,
+          ),
+      },
+      {
+        path: 'operations',
+        canActivate: [capabilityGuard],
+        data: { capability: 'operations.gated' },
+        loadComponent: () =>
+          import('./features/operations/operations.component').then((c) => c.OperationsComponent),
+      },
+      {
+        path: 'access-matrix',
+        loadComponent: () =>
+          import('./features/access-matrix/access-matrix.component').then(
+            (c) => c.AccessMatrixComponent,
+          ),
+      },
+      {
+        path: 'monitoring',
+        canActivate: [capabilityGuard],
+        data: { capability: 'monitoring.health' },
+        loadComponent: () =>
+          import('./features/monitoring/monitoring.component').then((c) => c.MonitoringComponent),
+      },
+      {
+        path: 'activity',
+        canActivate: [capabilityGuard],
+        data: { capability: 'activity.read' },
+        loadComponent: () =>
+          import('./features/activity/activity.component').then((c) => c.ActivityComponent),
+      },
+      {
+        path: 'revenue',
+        loadComponent: () =>
+          import('./features/dashboard/components/revenue-analytics/revenue-analytics.component').then(
+            (c) => c.RevenueAnalyticsComponent
+          ),
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./features/settings/settings.component').then((c) => c.SettingsComponent),
+      },
+    ],
   },
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: 'auth/login' }
+  { path: '**', redirectTo: 'dashboard' },
 ];

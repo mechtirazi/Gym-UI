@@ -1,0 +1,249 @@
+<div class="p-6 md:p-8 lg:p-10 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-1000">
+  <!-- Section Title -->
+  <div class="flex items-center justify-between mb-2">
+    <div>
+      <h1 class="text-3xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-slate-900 via-slate-800 to-slate-500">Revenue Analysis</h1>
+      <p class="text-slate-500 font-bold text-sm uppercase tracking-wide">Deep dive into platform earnings and subscription health.</p>
+    </div>
+    <div class="px-4 py-2 bg-gradient-to-r from-emerald-50 to-emerald-100/50 text-emerald-700 rounded-2xl border border-emerald-200/50 flex items-center gap-2 shadow-sm">
+      <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+      <span class="text-[10px] font-black uppercase tracking-widest">Live Updates</span>
+    </div>
+  </div>
+
+  <!-- specific analytics KPI -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="bg-gradient-to-br from-primary-600 via-primary-500 to-indigo-600 p-7 rounded-[2rem] text-white shadow-2xl shadow-primary-500/40 relative overflow-hidden group hover:-translate-y-1.5 transition-all duration-500 border border-primary-400/30">
+      <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-white/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+      <div class="absolute -left-10 -top-10 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700 delay-100"></div>
+      <div class="relative z-10">
+        <p class="text-primary-100 text-[10px] font-black uppercase tracking-widest mb-1 drop-shadow-sm">Total Platform MRR</p>
+        <h3 class="text-4xl font-black drop-shadow-md">{{ mrr() | currency:'USD':'symbol':'1.0-0' }}</h3>
+        <div class="mt-4 flex items-center gap-2">
+          <span class="px-2.5 py-1 bg-white/20 backdrop-blur-md border border-white/10 rounded-lg text-[10px] font-black tracking-wider flex items-center gap-1 shadow-sm"
+                [ngClass]="{'text-emerald-100': mrrGrowth() >= 0, 'text-red-200': mrrGrowth() < 0}">
+            <mat-icon class="text-[12px] h-3 w-3">{{ mrrGrowth() >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+            {{ mrrGrowth() > 0 ? '+' : '' }}{{ mrrGrowth() }}% vs last month
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white/80 backdrop-blur-xl p-7 rounded-[2rem] border border-white/50 shadow-lg shadow-slate-200/40 flex flex-col justify-between group hover:-translate-y-1.5 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/10 relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-400/10 rounded-full blur-3xl group-hover:bg-indigo-400/20 transition-all duration-500 mix-blend-multiply"></div>
+      <div class="relative z-10">
+        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Active Subscriptions</p>
+        <h3 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700">{{ activeSubscriptions() }}</h3>
+      </div>
+      <div class="relative z-10 mt-6 bg-slate-100/50 p-3 rounded-2xl border border-slate-200/50">
+        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Total active users across platform</p>
+      </div>
+    </div>
+
+    <div class="bg-white/80 backdrop-blur-xl p-7 rounded-[2rem] border border-white/50 shadow-lg shadow-slate-200/40 flex flex-col justify-between group hover:-translate-y-1.5 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/10 relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-400/10 rounded-full blur-3xl group-hover:bg-emerald-400/20 transition-all duration-500 mix-blend-multiply"></div>
+      <div class="relative z-10">
+        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Avg Revenue Per Gym</p>
+        <h3 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700">{{ arpu() | currency:'USD':'symbol':'1.0-0' }}</h3>
+      </div>
+      <div class="relative z-10 mt-6 flex items-center justify-between p-3 rounded-2xl"
+           [ngClass]="{'bg-emerald-50/50 border border-emerald-100': isHealthyGrowth(), 'bg-red-50/50 border border-red-100': !isHealthyGrowth()}">
+        <p class="text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5"
+           [ngClass]="{'text-emerald-600': isHealthyGrowth(), 'text-red-500': !isHealthyGrowth()}">
+          <mat-icon class="text-[14px] w-3.5 h-3.5">{{ isHealthyGrowth() ? 'auto_graph' : 'trending_down' }}</mat-icon>
+          {{ isHealthyGrowth() ? 'Healthy growth' : 'Needs attention' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- New KPI Cards: Subscription Health -->
+    <div class="bg-white/80 backdrop-blur-xl p-7 rounded-[2rem] border border-red-200 shadow-lg shadow-red-200/20 flex flex-col justify-between group hover:-translate-y-1.5 transition-all duration-500 hover:shadow-2xl hover:shadow-red-500/10 relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-red-400/10 rounded-full blur-3xl group-hover:bg-red-400/20 transition-all duration-500 mix-blend-multiply"></div>
+      <div class="relative z-10">
+        <p class="text-red-400 text-[10px] font-black uppercase tracking-widest mb-1">At Risk Revenue (7d)</p>
+        <h3 class="text-4xl font-black text-red-600">{{ atRiskRevenue() | currency:'USD':'symbol':'1.0-0' }}</h3>
+      </div>
+      <div class="relative z-10 mt-6 bg-red-50 p-3 rounded-2xl border border-red-100/50">
+        <p class="text-[9px] font-bold text-red-800 uppercase tracking-widest leading-tight">Expiring in next 7 days</p>
+      </div>
+    </div>
+
+    <div class="bg-slate-900 p-7 rounded-[2rem] border border-slate-800 shadow-2xl shadow-slate-900/40 flex flex-col justify-between group hover:-translate-y-1.5 transition-all duration-500 relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-slate-700 rounded-full blur-3xl opacity-20"></div>
+      <div class="relative z-10">
+        <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Churned Revenue (402)</p>
+        <h3 class="text-4xl font-black text-white">{{ churnedRevenue() | currency:'USD':'symbol':'1.0-0' }}</h3>
+      </div>
+      <div class="relative z-10 mt-6 bg-slate-800 p-3 rounded-2xl border border-slate-700 shadow-sm">
+        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-tight">Payment failures / Canceled</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Trend Line -->
+    <div class="lg:col-span-2 bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/50 shadow-xl shadow-slate-200/40 relative group overflow-hidden hover:shadow-2xl transition-all duration-500">
+      <div class="absolute -top-32 -right-32 w-64 h-64 bg-primary-400/5 rounded-full blur-3xl mix-blend-multiply"></div>
+      <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-secondary-400/5 rounded-full blur-3xl mix-blend-multiply"></div>
+      
+      <div class="flex items-center justify-between mb-8 relative z-10">
+        <div>
+          <h3 class="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-700">Revenue Growth</h3>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Trailing 6 Months</p>
+        </div>
+        <div class="p-3 bg-gradient-to-br from-slate-50 to-slate-100/80 rounded-2xl text-slate-400 border border-slate-200/50 shadow-sm transition-all group-hover:text-primary-500 group-hover:border-primary-200/50 group-hover:shadow-primary-500/10">
+          <mat-icon>show_chart</mat-icon>
+        </div>
+      </div>
+      
+      <div class="h-[320px] w-full relative z-10">
+        <div *ngIf="loading()" class="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm z-10 rounded-2xl">
+          <div class="flex flex-col items-center gap-4">
+            <div class="relative">
+              <div class="w-10 h-10 border-4 border-slate-200 rounded-full"></div>
+              <div class="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin absolute inset-0"></div>
+            </div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">Crunching data...</p>
+          </div>
+        </div>
+        
+        <div *ngIf="error()" class="absolute inset-0 flex items-center justify-center bg-red-50/50 backdrop-blur-sm z-10 rounded-2xl border border-red-100">
+          <div class="text-center p-6 space-y-3 bg-white/90 shadow-xl rounded-2xl border border-red-100 max-w-sm">
+            <div class="p-3 bg-red-100 text-red-600 rounded-2xl inline-block mb-2">
+              <mat-icon class="text-3xl h-8 w-8">error_outline</mat-icon>
+            </div>
+            <p class="text-sm font-bold text-slate-700">{{ error() }}</p>
+            <button (click)="loadData()" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-lg shadow-red-500/30 w-full mt-2">Try Again</button>
+          </div>
+        </div>
+
+        <apx-chart
+          *ngIf="!loading() && !error()"
+          [series]="lineChartOptions.series"
+          [chart]="lineChartOptions.chart"
+          [xaxis]="lineChartOptions.xaxis"
+          [yaxis]="lineChartOptions.yaxis"
+          [dataLabels]="lineChartOptions.dataLabels"
+          [stroke]="lineChartOptions.stroke"
+          [colors]="lineChartOptions.colors"
+          [fill]="lineChartOptions.fill"
+          [grid]="lineChartOptions.grid"
+          [tooltip]="lineChartOptions.tooltip"
+        ></apx-chart>
+      </div>
+    </div>
+
+    <!-- Distribution Pie -->
+    <div class="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/50 shadow-xl shadow-slate-200/40 relative group hover:shadow-2xl transition-all duration-500 flex flex-col">
+      <div class="flex items-center justify-between mb-8 relative z-10">
+        <div>
+          <h3 class="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-slate-900 to-slate-700">Plan Split</h3>
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Current Distribution</p>
+        </div>
+        <div class="p-3 bg-gradient-to-br from-slate-50 to-slate-100/80 rounded-2xl text-slate-400 border border-slate-200/50 shadow-sm transition-all group-hover:text-secondary-500 group-hover:border-secondary-200/50 group-hover:shadow-secondary-500/10">
+          <mat-icon>pie_chart_outline</mat-icon>
+        </div>
+      </div>
+
+      <div class="h-[300px] flex items-center justify-center relative">
+        <div *ngIf="loading()" class="absolute inset-0 flex items-center justify-center bg-white/50 z-10">
+          <div class="w-6 h-6 border-3 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+
+        <apx-chart
+          *ngIf="!loading() && !error()"
+          [series]="donutChartOptions.series"
+          [chart]="donutChartOptions.chart"
+          [labels]="donutChartOptions.labels"
+          [colors]="donutChartOptions.colors"
+          [legend]="donutChartOptions.legend"
+          [plotOptions]="donutChartOptions.plotOptions"
+          [stroke]="donutChartOptions.stroke"
+          [tooltip]="donutChartOptions.tooltip"
+        ></apx-chart>
+      </div>
+      
+      <div class="mt-4 space-y-3">
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-emerald-50 border border-emerald-100">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+            <span class="text-xs font-bold text-emerald-800">Basic Plan</span>
+          </div>
+          <span class="text-xs font-black text-emerald-900">{{ donutChartOptions.series[0] }} Gyms</span>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-primary-50 border border-primary-100">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-primary-500 rounded-full"></div>
+            <span class="text-xs font-bold text-primary-800">Pro Plan</span>
+          </div>
+          <span class="text-xs font-black text-primary-900">{{ donutChartOptions.series[1] }} Gyms</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscription Health: Expiring Soon -->
+  <div class="animate-in slide-in-from-bottom-5 duration-1000 delay-300">
+    <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white/50 shadow-xl shadow-slate-200/40 overflow-hidden">
+      <div class="p-8 border-b border-slate-100 flex items-center justify-between">
+        <div>
+           <h3 class="text-2xl font-black tracking-tight text-slate-900">Expiring Soon</h3>
+           <p class="text-xs text-slate-500 font-medium">Top 5 gyms requiring immediate attention for renewal.</p>
+        </div>
+        <div class="px-4 py-2 bg-amber-50 text-amber-600 rounded-xl border border-amber-200 text-[10px] font-black uppercase tracking-widest">
+           Priority Action Required
+        </div>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50/50 border-b border-slate-100 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+              <th class="py-4 px-8">Gym Name</th>
+              <th class="py-4 px-8">Owner</th>
+              <th class="py-4 px-8">Expiry Date</th>
+              <th class="py-4 px-8">Days Remaining</th>
+              <th class="py-4 px-8 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let gym of expiringGyms(); trackBy: trackByGymId" class="group border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
+              <td class="py-4 px-8">
+                <div class="flex items-center gap-3">
+                   <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs uppercase">{{ gym.name.charAt(0) }}</div>
+                   <span class="font-bold text-slate-900">{{ gym.name }}</span>
+                </div>
+              </td>
+              <td class="py-4 px-8 text-sm font-medium text-slate-600">{{ gym.owner?.name || 'Unknown' }}</td>
+              <td class="py-4 px-8 text-sm font-medium text-slate-600">{{ gym.expiry_date || 'N/A' | date:'mediumDate' }}</td>
+              <td class="py-4 px-8">
+                <span class="px-2.5 py-1 rounded-md text-[10px] font-black tracking-wider uppercase border"
+                      [ngClass]="{
+                        'bg-red-50 text-red-600 border-red-100': (gym.days_remaining || 0) <= 3,
+                        'bg-amber-50 text-amber-600 border-amber-100': (gym.days_remaining || 0) > 3
+                      }">
+                  {{ gym.days_remaining }} days left
+                </span>
+              </td>
+              <td class="py-4 px-8 text-right">
+                <button (click)="renewGym(gym.id_gym)" 
+                        [disabled]="actionLoading() === gym.id_gym"
+                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center gap-2 ml-auto">
+                   <mat-icon *ngIf="actionLoading() === gym.id_gym" class="animate-spin !text-[14px] !w-3.5 !h-3.5">refresh</mat-icon>
+                   <mat-icon *ngIf="actionLoading() !== gym.id_gym" class="!text-[14px] !w-3.5 !h-3.5">autorenew</mat-icon>
+                   {{ actionLoading() === gym.id_gym ? 'Renewing...' : 'Quick Renew' }}
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="expiringGyms().length === 0">
+               <td colspan="5" class="py-12 text-center text-slate-400 font-bold uppercase tracking-widest text-[10px]">
+                  All subscriptions are healthy
+               </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

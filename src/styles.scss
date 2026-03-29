@@ -1,31 +1,16 @@
-@import "tailwindcss";
+@use '@angular/material' as mat;
 
-@theme {
-  --color-primary-50: #f0f9ff;
-  --color-primary-100: #e0f2fe;
-  --color-primary-200: #bae6fd;
-  --color-primary-300: #7dd3fc;
-  --color-primary-400: #38bdf8;
-  --color-primary-500: #0ea5e9;
-  --color-primary-600: #0284c7;
-  --color-primary-700: #0369a1;
-  --color-primary-800: #075985;
-  --color-primary-900: #0c4a6e;
-  --color-primary-950: #082f49;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  --color-secondary-50: #fdf4ff;
-  --color-secondary-100: #fae8ff;
-  --color-secondary-200: #f5d0fe;
-  --color-secondary-300: #f0abfc;
-  --color-secondary-400: #e879f9;
-  --color-secondary-500: #d946ef;
-  --color-secondary-600: #c026d3;
-  --color-secondary-700: #a21caf;
-  --color-secondary-800: #86198f;
-  --color-secondary-900: #701a75;
-  --color-secondary-950: #4a044e;
-
-  --font-sans: "Inter", "ui-sans-serif", "system-ui";
+@layer utilities {
+  .animation-delay-2000 {
+    animation-delay: 2000ms;
+  }
+  .animation-delay-4000 {
+    animation-delay: 4000ms;
+  }
 }
 
 :root {
@@ -33,7 +18,9 @@
   --secondary-color: var(--color-secondary-500);
 
   --bg-main: #f8fafc;
+  --bg-color: #f8fafc; /* Alias for compatibility */
   --bg-card: #ffffff;
+  --bg-app-card: #ffffff; /* Alias for compatibility */
   --bg-header: rgba(255, 255, 255, 0.8);
   --bg-glass: rgba(255, 255, 255, 0.8);
   --bg-sidebar: #ffffff;
@@ -41,6 +28,7 @@
   --bg-input: #f8fafc;
 
   --text-main: #0f172a;
+  --text-color: #0f172a; /* Alias for compatibility */
   --text-muted: #64748b;
   --text-inverse: #ffffff;
 
@@ -49,11 +37,25 @@
 
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+
+  /* Setup Material Theme */
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
 }
 
 .dark {
   --bg-main: #020617;
+  --bg-color: #0f172a;
   --bg-card: #0f172a;
+  --bg-app-card: #1e293b;
   --bg-header: rgba(15, 23, 42, 0.8);
   --bg-glass: rgba(15, 23, 42, 0.8);
   --bg-sidebar: #0f172a;
@@ -61,11 +63,22 @@
   --bg-input: #1e293b;
 
   --text-main: #f8fafc;
+  --text-color: #f8fafc;
   --text-muted: #94a3b8;
   --text-inverse: #020617;
 
   --border-color: #1e293b;
   --border-glass: rgba(255, 255, 255, 0.1);
+}
+
+@layer components {
+  .bg-app-card {
+    background-color: var(--bg-app-card);
+  }
+}
+
+html, body {
+  height: 100%;
 }
 
 body {
@@ -74,6 +87,8 @@ body {
   background-color: var(--bg-main);
   color: var(--text-main);
   transition: background-color 0.3s ease, color 0.3s ease;
+  /* Fallback for Material theme background if needed */
+  background-color: var(--mat-sys-surface, var(--bg-main));
 }
 
 /* Shared UI primitives */
