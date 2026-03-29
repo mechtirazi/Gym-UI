@@ -6,6 +6,7 @@ export interface User {
   phone: string;
   role: 'admin' | 'staff' | 'member' | 'owner';
   gym_id?: number;
+  profile_picture?: string;
 }
 
 export interface AuthResponse {

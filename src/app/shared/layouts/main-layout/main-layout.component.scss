@@ -1,14 +1,14 @@
 .layout-container {
   display: flex;
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: var(--bg-main);
 }
 
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-left: 280px; /* Width of sidebar */
+  margin-left: 88px; /* Matches --sidebar-collapsed width */
   transition: margin-left 0.3s ease;
 }
 

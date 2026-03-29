@@ -1,4 +1,4 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, inject, output, signal, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { OwnerDashboardService } from '../../../services/owner-dashboard.service';
@@ -15,7 +15,8 @@ export class AddMemberModalComponent {
   private dashboardService = inject(OwnerDashboardService);
   private fb = inject(FormBuilder);
 
-  close = output<void>();
+  isOpen = input<boolean>(false);
+  onClose = output<void>();
   memberAdded = output<void>();
 
   isSubmitting = signal<boolean>(false);
@@ -28,7 +29,7 @@ export class AddMemberModalComponent {
   });
 
   closeModal() {
-    this.close.emit();
+    this.onClose.emit();
   }
 
   submitAddMember() {

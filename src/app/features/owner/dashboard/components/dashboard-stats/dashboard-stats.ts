@@ -12,7 +12,7 @@ import { finalize } from 'rxjs/operators';
 })
 export class DashboardStatsComponent implements OnInit {
   private dashboardService = inject(OwnerDashboardService);
-  
+
   isLoadingStats = signal<boolean>(true);
   stats = signal<any[]>([]);
 
@@ -27,10 +27,10 @@ export class DashboardStatsComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.stats.set([
-            { label: 'Total Revenue', value: `$${data.stats.totalRevenue.toLocaleString()}`, trend: `${data.stats.revenueTrend > 0 ? '+' : ''}${data.stats.revenueTrend}%`, isPositive: data.stats.revenueTrend >= 0 },
-            { label: 'Active Members', value: data.stats.activeMembers.toLocaleString(), trend: `${data.stats.membersTrend > 0 ? '+' : ''}${data.stats.membersTrend}%`, isPositive: data.stats.membersTrend >= 0 },
-            { label: 'New Memberships', value: data.stats.newMemberships.toString(), trend: `${data.stats.membershipsTrend > 0 ? '+' : ''}${data.stats.membershipsTrend}%`, isPositive: data.stats.membershipsTrend >= 0 },
-            { label: 'Active Trainers', value: data.stats.activeTrainers.toString(), trend: `${data.stats.trainersTrend > 0 ? '+' : ''}${data.stats.trainersTrend}`, isPositive: data.stats.trainersTrend >= 0 }
+            { label: 'Total Revenue', value: `${data.stats.totalRevenue.toLocaleString()} DT`, trend: `${data.stats.revenueTrend > 0 ? '+' : ''}${data.stats.revenueTrend}%`, isPositive: data.stats.revenueTrend >= 0, color: 'indigo', icon: 'payments' },
+            { label: 'Active Members', value: data.stats.activeMembers.toLocaleString(), trend: `${data.stats.membersTrend > 0 ? '+' : ''}${data.stats.membersTrend}%`, isPositive: data.stats.membersTrend >= 0, color: 'blue', icon: 'group' },
+            { label: 'New Memberships', value: data.stats.newMemberships.toString(), trend: `${data.stats.membershipsTrend > 0 ? '+' : ''}${data.stats.membershipsTrend}%`, isPositive: data.stats.membershipsTrend >= 0, color: 'emerald', icon: 'assignment' },
+            { label: 'Active Trainers', value: data.stats.activeTrainers.toString(), trend: `${data.stats.trainersTrend > 0 ? '+' : ''}${data.stats.trainersTrend}`, isPositive: data.stats.trainersTrend >= 0, color: 'amber', icon: 'fitness_center' }
           ]);
         }
       });

@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OwnerDashboardService, Checkin } from '../../../services/owner-dashboard.service';
+import { OwnerDashboardService } from '../../../services/owner-dashboard.service';
+import { Checkin } from '../../../../../shared/models/dashboard.model';
 import { finalize } from 'rxjs/operators';
 
 @Component({

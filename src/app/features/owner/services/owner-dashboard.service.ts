@@ -4,32 +4,7 @@ import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 
-export interface DashboardStats {
-  totalRevenue: number;
-  revenueTrend: number;
-  activeMembers: number;
-  membersTrend: number;
-  newMemberships: number;
-  membershipsTrend: number;
-  activeTrainers: number;
-  trainersTrend: number;
-}
-
-export interface DashboardData {
-  stats: DashboardStats;
-}
-
-export interface Checkin {
-  id: string;
-  memberName: string;
-  initials: string;
-  timeAgo: string;
-}
-
-export interface RevenueData {
-  month: string;
-  amount: number;
-}
+import { DashboardStats, DashboardData, Checkin, RevenueData } from '../../../shared/models/dashboard.model';
 
 @Injectable({
   providedIn: 'root'

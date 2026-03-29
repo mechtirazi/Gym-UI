@@ -12,7 +12,7 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-card);
   width: 100%;
   max-width: 450px;
   border-radius: 20px;
@@ -36,19 +36,19 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--text-main);
   }
 
   .close-btn {
     background: none;
     border: none;
     font-size: 1.5rem;
-    color: #94a3b8;
+    color: var(--text-muted);
     cursor: pointer;
     line-height: 1;
     transition: color 0.2s;
     
-    &:hover { color: #0f172a; }
+    &:hover { color: var(--text-main); }
   }
 }
 
@@ -66,12 +66,12 @@
   label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #475569;
+    color: var(--text-muted);
   }
 
   input {
     padding: 0.75rem 1rem;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--text-muted);
     border-radius: 10px;
     font-size: 0.95rem;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -100,13 +100,13 @@
   }
 
   .cancel-btn {
-    background: white;
-    border: 1px solid #cbd5e1;
-    color: #475569;
+    background: var(--bg-card);
+    border: 1px solid var(--text-muted);
+    color: var(--text-muted);
 
     &:hover:not(:disabled) {
-      background: #f8fafc;
-      color: #0f172a;
+      background: var(--bg-main);
+      color: var(--text-main);
     }
   }
 

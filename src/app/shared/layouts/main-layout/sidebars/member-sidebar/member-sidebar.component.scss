@@ -3,8 +3,8 @@
   flex-direction: column;
   width: 280px;
   height: 100vh;
-  background: #ffffff;
-  border-right: 1px solid #f1f5f9;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
   position: fixed;
   left: 0;
   top: 0;
@@ -31,7 +31,7 @@
 .logo-icon {
   width: 40px;
   height: 40px;
-  background: var(--color-primary-50);
+  background: var(--bg-hover);
   color: var(--color-primary-600);
   border-radius: 12px;
   display: flex;
@@ -41,7 +41,7 @@
 }
 
 .logo-text span {
-  color: #0f172a;
+  color: var(--text-main);
 }
 
 .sidebar-nav {
@@ -58,7 +58,7 @@
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--text-muted);
   letter-spacing: 0.05em;
 }
 
@@ -68,7 +68,7 @@
   gap: 1rem;
   padding: 0.75rem 1rem;
   border-radius: 12px;
-  color: #64748b;
+  color: var(--text-muted);
   text-decoration: none;
   font-weight: 500;
   font-size: 0.9rem;
@@ -76,13 +76,13 @@
 }
 
 .nav-item:hover {
-  background: #f8fafc;
-  color: #0f172a;
+  background: var(--bg-hover);
+  color: var(--text-main);
 }
 
 .nav-item.active {
-  background: var(--color-primary-50);
-  color: var(--color-primary-600);
+  background: var(--color-primary-600);
+  color: white;
 }
 
 .nav-icon {
@@ -98,7 +98,7 @@
 }
 
 .upgrade-card {
-  background: #0f172a;
+  background: var(--text-main); // Keep dark for style
   border-radius: 16px;
   padding: 1.25rem;
   color: white;
@@ -119,15 +119,15 @@
 
 .upgrade-desc {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   margin: 0.25rem 0 1rem 0;
 }
 
 .upgrade-btn {
   width: 100%;
   padding: 0.625rem;
-  background: #ffffff;
-  color: #0f172a;
+  background: var(--bg-card);
+  color: var(--text-main);
   border: none;
   border-radius: 8px;
   font-weight: 600;

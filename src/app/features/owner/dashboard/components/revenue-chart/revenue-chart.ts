@@ -29,7 +29,7 @@ export class RevenueChartComponent implements OnInit {
   @ViewChild('chart') chart!: ChartComponent;
   isLoadingChart = signal<boolean>(true);
   chartError = signal<string | null>(null);
-  
+
   public chartOptions: Partial<ChartOptions> | any = {
     series: [{ name: "Revenue", data: [] }],
     chart: { type: "bar", height: 320, toolbar: { show: false }, fontFamily: 'inherit', animations: { enabled: true } },
@@ -53,12 +53,12 @@ export class RevenueChartComponent implements OnInit {
       .pipe(finalize(() => this.isLoadingChart.set(false)))
       .subscribe({
         next: (data) => {
-           this.chartOptions.series = [{ name: 'Revenue', data: data.map(d => d.amount) }];
-           this.chartOptions.xaxis = { ...this.chartOptions.xaxis, categories: data.map(d => d.month) };
+          this.chartOptions.series = [{ name: 'Revenue', data: data.map(d => d.amount) }];
+          this.chartOptions.xaxis = { ...this.chartOptions.xaxis, categories: data.map(d => d.month) };
         },
         error: (err) => {
-           console.error('Failed to load chart', err);
-           this.chartError.set('Unable to load chart data');
+          console.error('Failed to load chart', err);
+          this.chartError.set('Unable to load chart data');
         }
       });
   }

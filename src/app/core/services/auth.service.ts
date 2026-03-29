@@ -16,6 +16,7 @@ export class AuthService {
   currentUser = signal<User | null>(this.getUserFromStorage());
   isAuthenticated = computed(() => !!this.currentUser());
   userRole = computed(() => this.currentUser()?.role);
+  connectedGymId = computed(() => this.currentUser()?.gym_id);
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -63,6 +64,23 @@ export class AuthService {
     this.router.navigate(['/auth/login']);
   }
 
+  updateCurrentUser(user: User): void {
+    localStorage.setItem('user', JSON.stringify(user));
+    this.currentUser.set(user);
+  }
+
+  switchGym(gymId: number): void {
+    const user = this.currentUser();
+    if (user) {
+      const updatedUser = { ...user, gym_id: gymId };
+      this.updateCurrentUser(updatedUser);
+      // Reload is necessary to force all services/components to re-fetch data for the new gym context
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    }
+  }
+
   getToken(): string | null {
     return localStorage.getItem('token');
   }
@@ -88,5 +106,12 @@ export class AuthService {
       localStorage.removeItem('user');
       return null;
     }
+  }
+
+  getAvatarUrl(path?: string): string {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    const baseUrl = this.API_URL.replace('/api', '');
+    return `${baseUrl}/storage/${path}`;
   }
 }

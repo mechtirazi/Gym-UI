@@ -3,16 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 
-export interface Gym {
-  id?: string | number;
-  name: string;
-  id_owner?: string | number; // Backend key
-  email?: string;
-  phone?: string;
-  adress?: string; // Backend key (typo in backend)
-  description?: string;
-  [key: string]: any;
-}
+import { Gym } from '../../../../shared/models/gym.model';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +23,11 @@ export class GymProfileService {
   /**
    * Updates a specific gym.
    */
-  updateGym(gymId: string | number, data: Partial<Gym>): Observable<Gym> {
-    return this.http.put<Gym>(`${this.apiUrl}/gyms/${gymId}`, data);
+  updateGym(gymId: string | number, data: Partial<Gym> | FormData): Observable<any> {
+    if (data instanceof FormData) {
+      data.append('_method', 'PUT');
+      return this.http.post<any>(`${this.apiUrl}/gyms/${gymId}`, data);
+    }
+    return this.http.put<any>(`${this.apiUrl}/gyms/${gymId}`, data);
   }
 }

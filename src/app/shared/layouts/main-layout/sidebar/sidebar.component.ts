@@ -12,13 +12,13 @@ import { AuthService } from '../../../../core/services/auth.service';
 })
 export class SidebarComponent {
   private authService = inject(AuthService);
-  
+
   userRole = this.authService.userRole;
 
   private allNavItems = [
     // Common items
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: ['admin', 'staff', 'member', 'owner'] },
-    
+
     // Owner specific items
     { label: 'My Gym', icon: 'gym', route: '/owner/gym-profile', roles: ['owner'] },
     { label: 'Trainers', icon: 'fitness', route: '/owner/trainers', roles: ['owner', 'admin'] },
@@ -31,7 +31,7 @@ export class SidebarComponent {
     { label: 'My Workouts', icon: 'calendar', route: '/member/workouts', roles: ['member'] },
     { label: 'Exercises', icon: 'fitness', route: '/exercises', roles: ['member', 'staff'] },
     { label: 'Nutrition', icon: 'food', route: '/nutrition', roles: ['member'] },
-    
+
     // Admin specific items
     { label: 'Gyms Management', icon: 'gym', route: '/admin/gyms', roles: ['admin'] },
     { label: 'System Logs', icon: 'settings', route: '/admin/logs', roles: ['admin'] },

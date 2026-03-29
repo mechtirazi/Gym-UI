@@ -37,18 +37,29 @@ export const routes: Routes = [
     loadComponent: () => import('./shared/layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     // canActivate: [authGuard],
     children: [
+      { 
+        path: 'settings', 
+        loadComponent: () => import('./features/shared/settings/settings.component').then(m => m.SettingsComponent) 
+      },
       {
         path: 'owner',
         children: [
           { path: 'dashboard', loadComponent: () => import('./features/owner/dashboard/owner-dashboard.component').then(m => m.OwnerDashboardComponent) },
           { path: 'gym-profile', loadComponent: () => import('./features/owner/gym-profile/gym-profile').then(m => m.GymProfileComponent) },
           { path: 'trainers', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
-          { path: 'members', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
-          { path: 'memberships', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
-          { path: 'revenue', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+          { path: 'members', loadComponent: () => import('./features/owner/member/member.component').then(m => m.MemberManagementComponent) },
+          { path: 'memberships', loadComponent: () => import('./features/owner/membership/membership.component').then(m => m.MembershipManagementComponent) },
+          { path: 'revenue', loadComponent: () => import('./features/owner/revenue/revenue.component').then(m => m.OwnerRevenueComponent) },
+          { path: 'attendance', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+          { path: 'courses', loadComponent: () => import('./features/owner/courses/courses.component').then(m => m.CourseManagementComponent) },
+          { path: 'events', loadComponent: () => import('./features/owner/events/events.component').then(m => m.EventManagementComponent) },
           { path: 'staff', loadComponent: () => import('./features/owner/staff/staff.component').then(m => m.StaffManagementComponent) },
           { path: 'equipment', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
-          { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+          { path: 'products', loadComponent: () => import('./features/owner/products/products.component').then(m => m.ProductManagementComponent) },
+          { path: 'subscriptions', loadComponent: () => import('./features/owner/subscriptions/subscriptions.component').then(m => m.SubscriptionManagementComponent) },
+          { path: 'community', loadComponent: () => import('./features/owner/community/community.component').then(m => m.CommunityComponent) },
+          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+          { path: 'nutrition', loadComponent: () => import('./features/owner/nutrition/nutrition.component').then(m => m.NutritionManagementComponent) },
         ]
       },
       {
